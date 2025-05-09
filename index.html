@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      color: white;
+      text-shadow: 2px 2px 5px #000;
+      position: relative;
+    }
+
+    body::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-image: url('bg.jpg');
+      background-size: cover;
+      background-position: center;
+      opacity: 0.04;
+      z-index: -1;
+    }
+
+    h1 {
+      font-size: 60px;
+      margin-bottom: 50px;
+      color: #00008B;
+    }
+
+    .emoji-container {
+      display: flex;
+      gap: 100px;
+      margin-bottom: 40px;
+    }
+
+    .emoji {
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-size: 100px;
+      transition: transform 0.2s;
+    }
+
+    .emoji:hover {
+      transform: scale(1.1);
+    }
+
+    .emoji img {
+      width: 250px;
+      height: auto;
+      border-radius: 15px;
+    }
+
+    .emoji-text {
+      font-size: 24px;
+      margin-top: 10px;
+      color: #00008B;
+    }
+
+    .reset-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      font-size: 16px;
+      padding: 6px 12px;
+      background: transparent;
+      color: #333;
+      border: 1px solid #f2f2f2;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .reset-btn:hover {
+      background: #f2f2f2;
+    }
+  </style>
+</head>
+<body>
+  <button class="reset-btn" onclick="resetCounts()">Reset All</button>
+
+  <h1>ຄວາມຮູ້ສຶກຕໍ່ກັບງານຄັ້ງນີ້</h1>
+
+  <div class="emoji-container">
+    <div class="emoji" onclick="submitFeedback('😀')">
+      <img src="happy.jpg" alt="Happy">
+      <div class="emoji-text">ປະທັບໃຈຫຼາຍ-Good</div>
+    </div>
+    <div class="emoji" onclick="submitFeedback('😐')">
+      <img src="neutral.jpg" alt="Neutral">
+      <div class="emoji-text">ປະທັບໃຈ-Neutral</div>
+    </div>
+    <div class="emoji" onclick="submitFeedback('😞')">
+      <img src="sad.jpg" alt="Sad">
+      <div class="emoji-text">ບໍ່ປະທັບໃຈ-Bad</div>
+    </div>
+  </div>
+
+  <script>
+    const emojis = ['😀', '😐', '😞'];
+    const counts = {};
+
+    emojis.forEach(emoji => {
+      const stored = localStorage.getItem(`count-${emoji}`) || '0';
+      counts[emoji] = parseInt(stored, 10);
+    });
+
+    function submitFeedback(emoji) {
+      counts[emoji]++;
+      localStorage.setItem(`count-${emoji}`, counts[emoji]);
+    }
+
+    function resetCounts() {
+      if (confirm("Are you sure you want to reset all counts?")) {
+        exportLog();
+        emojis.forEach(emoji => {
+          counts[emoji] = 0;
+          localStorage.removeItem(`count-${emoji}`);
+        });
+      }
+    }
+
+    function exportLog() {
+      let log = "Feedback Log:\n";
+      emojis.forEach(emoji => {
+        log += `${emoji}: ${counts[emoji]}\n`;
+      });
+
+      const blob = new Blob([log], { type: 'text/plain' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'feedback_log.txt';
+      link.click();
+    }
+  </script>
+</body>
+</html>
